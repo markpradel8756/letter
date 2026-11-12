@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Love letter icon">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fff7f4"/>
+      <stop offset="100%" stop-color="#fce7ef"/>
+    </linearGradient>
+    <linearGradient id="letter" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fff3f5"/>
+    </linearGradient>
+    <linearGradient id="heart" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ff7a9b"/>
+      <stop offset="100%" stop-color="#d93b56"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="26" fill="url(#bg)"/>
+
+  <g transform="translate(14 18)">
+    <path d="M0 22 L50 54 L100 22 V68 C100 77 93 84 84 84 H16 C7 84 0 77 0 68 Z" fill="url(#letter)" stroke="#d89aa7" stroke-width="3"/>
+    <path d="M0 22 L50 54 L100 22" fill="none" stroke="#c77d8f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <path d="M43 34 C32 18, 12 19, 12 37 C12 56, 28 64, 43 77 C58 64, 74 56, 74 37 C74 19, 54 18, 43 34 Z" fill="url(#heart)"/>
+    <path d="M43 52 C36 41, 24 40, 20 46 C15 53, 18 64, 29 70 C35 73, 40 75, 43 77 C46 75, 51 73, 57 70 C68 64, 71 53, 66 46 C62 40, 50 41, 43 52 Z" fill="#fff3f6" opacity="0.9"/>
+  </g>
+</svg>
