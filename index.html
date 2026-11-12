@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A letter I've been keeping in my heart.">
+  <meta name="theme-color" content="#FFF8EE">
+  <title>A Letter From My Heart</title>
+
+  <!-- Fonts
+       Great Vibes ........ elegant script for titles and the signature
+       Caveat ............. readable handwriting for the letter itself
+       Cormorant Garamond . classic serif for supporting text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Great+Vibes&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Without JavaScript, skip the envelope and show everything -->
+  <noscript>
+    <style>
+      .opening { display: none !important; }
+      .story { display: block !important; opacity: 1 !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+      body { overflow: auto !important; }
+      .controls, .progress, .dots { display: none !important; }
+    </style>
+  </noscript>
+</head>
+
+<body class="is-sealed">
+
+  <!-- =====================================================================
+       SVG SPRITE: reusable drawings (wax seal, rose, open Bible, icons)
+       ===================================================================== -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="waxFill" cx="38%" cy="32%" r="75%">
+        <stop offset="0%" stop-color="#c0414f"/>
+        <stop offset="50%" stop-color="#93232f"/>
+        <stop offset="100%" stop-color="#5e121b"/>
+      </radialGradient>
+      <linearGradient id="waxShine" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity=".35"/>
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+
+    <!-- Heart-shaped wax seal with an embossed heart -->
+    <symbol id="wax-seal" viewBox="0 0 100 100">
+      <path fill="url(#waxFill)" d="M50 93C47 90 40 86 33 80 22 71 8 59 6 42 4 27 12 11 28 9c9-1 17 3 22 11 5-8 13-12 22-11 16 2 24 18 22 33-2 17-16 29-27 38-7 6-14 10-17 13z"/>
+      <path fill="none" stroke="#5e121b" stroke-opacity=".55" stroke-width="2" d="M50 74C38 65 27 56 27 44c0-8 6-14 13-14 5 0 8 3 10 7 2-4 5-7 10-7 7 0 13 6 13 14 0 12-11 21-23 30z"/>
+      <path fill="none" stroke="#e98b95" stroke-opacity=".45" stroke-width="1.4" d="M50 71C40 63 30 55 30 45c0-6 5-11 10-11 5 0 8 3 10 7 2-4 5-7 10-7 5 0 10 5 10 11 0 10-10 18-20 26z"/>
+      <path fill="url(#waxShine)" d="M28 14c-11 2-17 13-16 25 4-9 10-16 20-19 4-1 6-5-4-6z"/>
+    </symbol>
+
+    <!-- Small vintage rose with champagne-gold leaves -->
+    <symbol id="rose" viewBox="0 0 64 64">
+      <path d="M14 46C6 45 2 37 5 30c8 2 13 8 13 15z" fill="#D6B77A"/>
+      <path d="M50 46c8-1 12-9 9-16-8 2-13 8-13 15z" fill="#D6B77A"/>
+      <path d="M32 52v10" stroke="#B89A5E" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="32" cy="32" r="18" fill="#C77D85"/>
+      <path d="M16 32c0 10 7 17 16 17 10 0 16-7 16-16" fill="none" stroke="#a65d67" stroke-width="2" stroke-linecap="round"/>
+      <path d="M32 16c12 0 18 10 16 18-2 8-10 13-18 11-8-2-11-10-7-16 4-6 12-6 14 0 2 5-2 8-5 6" fill="none" stroke="#713C46" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- Open Bible -->
+    <symbol id="bible" viewBox="0 0 80 50">
+      <path d="M40 10C30 3 15 3 4 7v38c11-4 26-4 36 3 10-7 25-7 36-3V7C65 3 50 3 40 10z" fill="#FFF8EE" stroke="#765B49" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M40 10v38" stroke="#765B49" stroke-width="1.8"/>
+      <path d="M11 15c7-2 15-2 22 1M11 21c7-2 15-2 22 1M11 27c7-2 15-2 22 1M11 33c7-2 15-2 22 1M47 16c7-3 15-3 22-1M47 22c7-3 15-3 22-1M47 28c7-3 15-3 22-1M47 34c7-3 15-3 22-1" fill="none" stroke="#D6B77A" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M58 5v14l3-3 3 3V5" fill="#C77D85"/>
+    </symbol>
+
+    <!-- Line icons for the memory cards (stroke = currentColor) -->
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H10l-5 4v-4H4z"/><path d="M8 9.5h8M8 12.5h5"/></symbol>
+    <symbol id="i-school" viewBox="0 0 24 24"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l2.2 6.3L20 12l-5.8 2.7L12 21l-2.2-6.3L4 12l5.8-2.7z"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8 7l1.5-3h5L16 7"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9H3z"/><path d="M10 20v-5h4v5"/></symbol>
+    <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14c1 2 2.5 3 4 3s3-1 4-3"/><path d="M9 9.5h.01M15 9.5h.01"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+    <symbol id="i-umbrella" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 18 0z"/><path d="M12 12v6a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M9 21h6"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.3A4.7 4.7 0 0 0 21 9.7C21 5.9 17 3 12 3z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10" cy="7.5" r="1"/><circle cx="15" cy="7.5" r="1"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6c-2-1.5-5-2-8-1v13c3-1 6-.5 8 1 2-1.5 5-2 8-1V5c-3-1-6-.5-8 1z"/><path d="M12 6v13"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#letter">Skip to the letter</a>
+
+  <!-- Reading progress indicator -->
+  <div class="progress" aria-hidden="true"><span class="progress__bar" id="progressBar"></span></div>
+
+  <!-- Floating petals and tiny hearts (filled in by script.js, always behind the text) -->
+  <div class="petals" id="petals" aria-hidden="true"></div>
+
+
+  <!-- =====================================================================
+       1. OPENING SCREEN: THE SEALED LETTER
+       ===================================================================== -->
+  <section class="opening" id="opening" aria-labelledby="openingIntro">
+    <div class="opening__inner">
+      <p class="opening__intro" id="openingIntro">A letter I've been keeping in my heart&hellip;</p>
+
+      <!-- The envelope is clickable / tappable; keyboard users use the button below -->
+      <div class="envelope-float">
+        <div class="envelope" id="envelope" aria-hidden="true">
+          <div class="envelope__back"></div>
+
+          <!-- Warm light that spills out when the flap opens -->
+          <div class="envelope__glow"></div>
+
+          <!-- The letter tucked inside, which rises out and unfolds -->
+          <div class="envelope__letter">
+            <span class="envelope__letter-crease"></span>
+            <span class="envelope__letter-to">For you</span>
+            <span class="envelope__letter-line"></span>
+            <span class="envelope__letter-line"></span>
+            <span class="envelope__letter-line envelope__letter-line--short"></span>
+          </div>
+
+          <div class="envelope__pocket"></div>
+          <div class="envelope__flap"></div>
+
+          <!-- Wax seal: shown whole, then cracks into two halves -->
+          <div class="envelope__seal">
+            <svg class="seal-whole" viewBox="0 0 100 100"><use href="#wax-seal"/></svg>
+            <svg class="seal-half seal-half--left" viewBox="0 0 100 100"><use href="#wax-seal"/></svg>
+            <svg class="seal-half seal-half--right" viewBox="0 0 100 100"><use href="#wax-seal"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn--primary" id="openLetterBtn">
+        <svg class="btn__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg>
+        Open My Letter
+      </button>
+      <p class="opening__hint">Tap the envelope to open it &middot; soft music will play</p>
+    </div>
+  </section>
+
+
+  <!-- =====================================================================
+       THE STORY (shown after the envelope is opened)
+       ===================================================================== -->
+  <main class="story" id="story" hidden>
+
+    <!-- ---------- Title page ---------- -->
+    <header class="hero" id="top">
+      <div class="hero__inner">
+        <svg class="hero__rose" viewBox="0 0 64 64" aria-hidden="true"><use href="#rose"/></svg>
+        <h1 class="hero__title" id="storyTitle" tabindex="-1">To Someone Who Stayed in My Heart</h1>
+        <p class="hero__subtitle">A story of a beautiful encounter, an unexpected friendship, and feelings that remained.</p>
+        <div class="ornament" aria-hidden="true"><span></span><svg viewBox="0 0 24 24"><use href="#i-heart"/></svg><span></span></div>
+
+        <nav class="chapters" aria-label="Chapters of this letter">
+          <p class="chapters__label">Inside this letter</p>
+          <ol class="chapters__list">
+            <li><a href="#letter">The Letter</a></li>
+            <li><a href="#beginning">The Day It All Began</a></li>
+            <li><a href="#moments">Little Moments</a></li>
+            <li><a href="#dream">The Girl From My Dreams</a></li>
+            <li><a href="#encouragement">A Little Encouragement</a></li>
+            <li><a href="#hope">A Quiet Hope</a></li>
+          </ol>
+        </nav>
+
+        <a class="scroll-cue" href="#letter">
+          <span>Begin reading</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </a>
+      </div>
+    </header>
+
+
+    <!-- =================================================================
+         2. THE LOVE LETTER
+         ================================================================= -->
+    <section class="section section--letter" id="letter" aria-label="The letter">
+      <article class="paper letter reveal">
+        <svg class="paper__rose paper__rose--tl" viewBox="0 0 64 64" aria-hidden="true"><use href="#rose"/></svg>
+        <svg class="paper__rose paper__rose--br" viewBox="0 0 64 64" aria-hidden="true"><use href="#rose"/></svg>
+
+        <!-- Tip: replace "Dear you," with her name if you like -->
+        <p class="letter__greeting">Dear you,</p>
+
+        <div class="letter__body">
+          <p>I've started this letter more times than I can count. The words never felt quite right. Maybe some feelings are easier to carry than to explain. Still, I wanted to try, at least once, to put them on paper honestly.</p>
+
+          <p>I still remember the trip my family took to Mawab during the COVID era. We went with my mother's friend, Roselyn Malabo, to visit her mother's house in their hometown. It was supposed to be a simple trip: a little rest, a massage, a change of scenery.</p>
+
+          <p>Then we attended a meeting at your Kingdom Hall. And that was the first time I saw you.</p>
+
+          <p>Afterward, we took a group photo together, my family and the members of your congregation, all standing side by side. Among all the people there, I noticed you. I can't fully explain what happened in that moment, but something about you stayed with me. I never expected that one simple encounter would become a memory I would carry for years.</p>
+
+          <p>At first, it was just admiration, the quiet kind you keep to yourself. But as time went on, it slowly grew into something deeper.</p>
+
+          <p>Little by little, our conversations became a friendship I never saw coming. We talked about school and schoolwork, about our families, music, anime, photography, and all the little things that filled our days. We joked around, teased each other, exchanged compliments, and shared songs and pictures. Sometimes we talked about deeper things too: love, friendships, past experiences, personal struggles, and how important it is to choose someone who shares our spiritual values.</p>
+
+          <p>And there's something I have to say: you have a beautiful voice. I still remember the voice messages you sent me on Messenger of you singing. Even through a short recording, your voice stayed with me, and those moments became some of the little things I hold dear. And your drawings are beautiful too. You have a real gift, and I've always admired it.</p>
+
+          <p>There were times when you felt insecure, or when you were carrying problems that weighed on you. In those moments, I tried my best to remind you of your worth, and to remind you that you can always trust Jehovah. I meant every word. And thank you for opening up to me, for letting me listen, and for sharing your thoughts and your everyday moments. Through them, I came to understand more about who you are and the things that matter to you.</p>
+
+          <p>What I treasure most isn't only what we talked about. It's the comfort and trust that quietly grew between us. Even our simplest conversations, about schoolwork, random thoughts, something funny, or our faith, became memories worth keeping.</p>
+
+          <p>I know we haven't had many chances to see each other in person. Distance and the responsibilities we each carry make it hard to spend time together, and sometimes even hard to talk regularly. But I've never stopped appreciating our conversations and the memories we've made.</p>
+
+          <p>And here's something I've never really said: whenever I see your photos, especially the ones where you're facing away or your face isn't fully shown, I'm reminded of a faceless dream girl I used to imagine long before I ever met you. It's a strange feeling, but a beautiful one, that someone I once only pictured in my dreams could remind me of someone real.</p>
+
+          <p>I admire you: your heart, your faith, and the person you are. I'm grateful for every conversation, every laugh, and every moment you've chosen to share with me. And I truly hope we can keep making meaningful memories.</p>
+
+          <p>But please know this, too: I'm not writing this to ask anything of you. You don't owe me an answer or any feelings in return. Whatever our connection means to you is yours to decide, and I will respect it completely. I simply wanted you to know that you've become a special part of my life, and that alone is something I'm thankful for.</p>
+        </div>
+
+        <p class="letter__sign">With all sincerity,</p>
+      </article>
+    </section>
+
+
+    <!-- =================================================================
+         3. THE DAY IT ALL BEGAN (scrapbook timeline)
+         ================================================================= -->
+    <section class="section section--beginning" id="beginning" aria-labelledby="beginningTitle">
+      <div class="section__head reveal">
+        <p class="kicker">A memory from Mawab</p>
+        <h2 class="section__title" id="beginningTitle">The Day It All Began</h2>
+        <p class="section__lead">It was only one trip, but it's the page I keep turning back to.</p>
+      </div>
+
+      <!-- Photo placeholders.
+           To add your real photos, put them in an "images" folder using these file names.
+           The script loads them automatically; until then, an elegant placeholder is shown. -->
+      <div class="scrapbook reveal">
+
+        <figure class="polaroid polaroid--right">
+          <div class="photo" data-photo="images/kh.jpg" data-alt="Group photo of my family with members of the congregation at the Kingdom Hall">
+            <div class="photo__placeholder">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-camera"/></svg>
+              <span>Our group photo will rest here</span>
+            </div>
+          </div>
+          <figcaption>The group photo at the Kingdom Hall</figcaption>
+        </figure>
+      </div>
+
+      <ol class="timeline">
+        <li class="timeline__item reveal">
+          <div class="note">
+            <p class="note__step">I</p>
+            <h3 class="note__title">A trip to Mawab</h3>
+            <p>During the COVID era, my family and I traveled to Mawab with my mother's friend, Roselyn Malabo.</p>
+          </div>
+        </li>
+        <li class="timeline__item reveal">
+          <div class="note">
+            <p class="note__step">II</p>
+            <h3 class="note__title">Her mother's home</h3>
+            <p>We visited the house of Roselyn Malabo's mother, in their hometown.</p>
+          </div>
+        </li>
+        <li class="timeline__item reveal">
+          <div class="note">
+            <p class="note__step">III</p>
+            <h3 class="note__title">A massage and a gentle trip</h3>
+            <p>We went for a massage and simply enjoyed the trip, never expecting anything more.</p>
+          </div>
+        </li>
+        <li class="timeline__item reveal">
+          <div class="note">
+            <p class="note__step">IV</p>
+            <h3 class="note__title">A meeting at the Kingdom Hall</h3>
+            <p>Eventually, we attended a meeting at their Kingdom Hall.</p>
+          </div>
+        </li>
+        <li class="timeline__item timeline__item--highlight reveal">
+          <div class="note">
+            <p class="note__step">V</p>
+            <h3 class="note__title">The first time I saw you</h3>
+            <p>And there, for the very first time, I saw you.</p>
+          </div>
+        </li>
+        <li class="timeline__item reveal">
+          <div class="note">
+            <p class="note__step">VI</p>
+            <h3 class="note__title">One group photograph</h3>
+            <p>My family and members of your congregation gathered for a group photo. Among everyone there, I noticed you.</p>
+          </div>
+        </li>
+        <li class="timeline__item reveal">
+          <div class="note">
+            <p class="note__step">VII</p>
+            <h3 class="note__title">Something unexpected</h3>
+            <p>A simple encounter, yet something in my heart began that day, and it has stayed with me ever since.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+
+    <!-- =================================================================
+         4. LITTLE MOMENTS, MEANINGFUL MEMORIES (flip cards)
+         ================================================================= -->
+    <section class="section section--moments" id="moments" aria-labelledby="momentsTitle">
+      <div class="section__head reveal">
+        <p class="kicker">Our little world</p>
+        <h2 class="section__title" id="momentsTitle">Little Moments, Meaningful Memories</h2>
+        <p class="section__lead section__lead--hand">Sometimes, it's not the grandest moments that become the most unforgettable. Sometimes, it's the ordinary conversations, random jokes, shared songs, and little things that slowly become memories worth keeping.</p>
+        <p class="section__hint">Tap a card to turn it over.</p>
+      </div>
+
+      <ul class="memory-grid" role="list">
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chat"/></svg>
+                <span class="memory-card__title">Everyday Conversations</span>
+              </span>
+              <span class="memory-card__face memory-card__back">Random thoughts, daily stories, and small updates about life that slowly became something I looked forward to.</span>
+            </span>
+          </button>
+        </li>
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-school"/></svg>
+                <span class="memory-card__title">School Days</span>
+              </span>
+              <span class="memory-card__face memory-card__back">Stories about school, schoolwork, and all the everyday experiences that came with them.</span>
+            </span>
+          </button>
+        </li>
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-music"/></svg>
+                <span class="memory-card__title">Songs We Shared</span>
+              </span>
+              <span class="memory-card__face memory-card__back">The music we talked about and the songs we shared. Each one now carries a little memory.</span>
+            </span>
+          </button>
+        </li>
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mic"/></svg>
+                <span class="memory-card__title">Your Singing Voice</span>
+              </span>
+              <span class="memory-card__face memory-card__back">The voice messages you sent on Messenger, singing. You have such a beautiful voice.</span>
+            </span>
+          </button>
+        </li>
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-palette"/></svg>
+                <span class="memory-card__title">Your Drawings</span>
+              </span>
+              <span class="memory-card__face memory-card__back">Your drawings, and the talent and care in every one of them. They're beautiful.</span>
+            </span>
+          </button>
+        </li>
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sparkle"/></svg>
+                <span class="memory-card__title">Anime &amp; Interests</span>
+              </span>
+              <span class="memory-card__face memory-card__back">Talking about anime and the personal interests that make each of us who we are.</span>
+            </span>
+          </button>
+        </li>
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-camera"/></svg>
+                <span class="memory-card__title">Photography &amp; Pictures</span>
+              </span>
+              <span class="memory-card__face memory-card__back">The pictures we shared and our talks about photography: little glimpses into each other's world.</span>
+            </span>
+          </button>
+        </li>
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-home"/></svg>
+                <span class="memory-card__title">Family Stories</span>
+              </span>
+              <span class="memory-card__face memory-card__back">The stories about our families and the people who matter most to us.</span>
+            </span>
+          </button>
+        </li>
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-smile"/></svg>
+                <span class="memory-card__title">Jokes, Teasing &amp; Compliments</span>
+              </span>
+              <span class="memory-card__face memory-card__back">The laughter, the playful teasing, and the compliments that made ordinary conversations brighter.</span>
+            </span>
+          </button>
+        </li>
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg>
+                <span class="memory-card__title">Love &amp; Friendship</span>
+              </span>
+              <span class="memory-card__face memory-card__back">Honest talks about love, friendships, past experiences, and choosing someone who shares our spiritual values.</span>
+            </span>
+          </button>
+        </li>
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-umbrella"/></svg>
+                <span class="memory-card__title">Struggles &amp; Encouragement</span>
+              </span>
+              <span class="memory-card__face memory-card__back">The times you opened up about what you were going through, and I tried to remind you of your worth.</span>
+            </span>
+          </button>
+        </li>
+        <li class="reveal">
+          <button type="button" class="memory-card" aria-pressed="false">
+            <span class="memory-card__inner">
+              <span class="memory-card__face memory-card__front">
+                <svg class="memory-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-book"/></svg>
+                <span class="memory-card__title">Faith &amp; Jehovah</span>
+              </span>
+              <span class="memory-card__face memory-card__back">Spiritual conversations, and gentle reminders to keep trusting Jehovah.</span>
+            </span>
+          </button>
+        </li>
+      </ul>
+    </section>
+
+
+    <!-- =================================================================
+         5. THE GIRL FROM MY DREAMS
+         ================================================================= -->
+    <section class="section section--dream" id="dream" aria-labelledby="dreamTitle">
+      <div class="dream__sky" id="dreamSky" aria-hidden="true"></div>
+
+      <div class="dream__layout">
+        <!-- Her photo, in a soft arched frame with moonlight behind it -->
+        <figure class="dream__art reveal">
+          <div class="dream__moon" aria-hidden="true"></div>
+          <div class="dream__frame">
+            <img class="dream__photo" src="images/dream-girl.png" width="465" height="464"
+                 alt="A girl with long wavy hair tied with a white ribbon, seen from behind, standing among tall grass and trees"
+                 loading="lazy" decoding="async">
+          </div>
+        </figure>
+
+        <div class="dream__text">
+          <p class="kicker kicker--light reveal">A faceless dream</p>
+          <h2 class="section__title section__title--light reveal" id="dreamTitle">The Girl From My Dreams</h2>
+          <p class="reveal">Long before I met you, there was someone I used to imagine in my dreams. I never really knew what she looked like. She was simply a faceless figure, someone whose presence I could only picture in my imagination.</p>
+          <p class="dream__pause reveal">Then, years later, I met you.</p>
+          <p class="reveal">And sometimes, whenever I see your photographs, especially the ones where you're facing away or your face isn't completely shown, I'm reminded of that old dream.</p>
+          <p class="reveal">It's difficult to explain, but there's something beautiful about how someone I once imagined can remind me so much of someone real.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =================================================================
+         6. A LITTLE ENCOURAGEMENT FOR YOUR HEART (Bible verses, NWT)
+         ================================================================= -->
+    <section class="section section--faith" id="encouragement" aria-labelledby="faithTitle">
+      <div class="section__head reveal">
+        <svg class="faith__bible" viewBox="0 0 80 50" aria-hidden="true"><use href="#bible"/></svg>
+        <p class="kicker">From one friend in the faith to another</p>
+        <h2 class="section__title" id="faithTitle">A Little Encouragement for Your Heart</h2>
+        <p class="section__lead">Apart from everything I've written above, I truly admire your love for Jehovah. These are two scriptures I wanted to share with you.</p>
+      </div>
+
+      <div class="verse-cards">
+        <!-- First card -->
+        <article class="verse-card reveal" aria-labelledby="verse1Title">
+          <svg class="verse-card__flourish verse-card__flourish--tl" viewBox="0 0 64 64" aria-hidden="true"><use href="#rose"/></svg>
+          <svg class="verse-card__icon" viewBox="0 0 80 50" aria-hidden="true"><use href="#bible"/></svg>
+          <h3 class="verse-card__title" id="verse1Title">A Reminder About Genuine Love</h3>
+
+          <figure class="scripture">
+            <blockquote class="scripture__text">
+              <p><sup>4</sup>&nbsp;Love is patient and kind. Love is not jealous. It does not brag, does not get puffed up,</p>
+              <p class="scripture__gap" aria-label="verses 5 and 6 omitted">&middot; &middot; &middot;</p>
+              <p><sup>7</sup>&nbsp;It bears all things, believes all things, hopes all things, endures all things.</p>
+            </blockquote>
+            <figcaption class="scripture__ref">1&nbsp;Corinthians 13:4,&nbsp;7 <span>&middot; New World Translation</span></figcaption>
+          </figure>
+
+          <div class="reflection">
+            <p class="reflection__label">My reflection</p>
+            <p>These verses remind me that genuine love is not about rushing things, demanding attention, or expecting something in return. It is about being patient, kind, understanding, and respectful. I hope that whatever happens, I can always express my feelings with those qualities.</p>
+          </div>
+        </article>
+
+        <!-- Second card -->
+        <article class="verse-card reveal" aria-labelledby="verse2Title">
+          <svg class="verse-card__flourish verse-card__flourish--tl" viewBox="0 0 64 64" aria-hidden="true"><use href="#rose"/></svg>
+          <svg class="verse-card__icon" viewBox="0 0 80 50" aria-hidden="true"><use href="#bible"/></svg>
+          <h3 class="verse-card__title" id="verse2Title">Keep Going in Your Service to Jehovah</h3>
+
+          <figure class="scripture">
+            <blockquote class="scripture__text">
+              <p><sup>58</sup>&nbsp;Therefore, my beloved brothers, be <mark>steadfast, immovable, always having plenty to do in the work of the Lord</mark>, knowing that <mark>your labor in connection with the Lord is not in vain</mark>.</p>
+            </blockquote>
+            <figcaption class="scripture__ref">1&nbsp;Corinthians 15:58 <span>&middot; New World Translation</span></figcaption>
+          </figure>
+
+          <div class="reflection">
+            <p class="reflection__label">A little encouragement</p>
+            <p>I know that serving Jehovah isn't always easy. There may be days when you feel tired, discouraged, or overwhelmed by the things happening around you. But I hope you never forget that everything you do for Jehovah matters.</p>
+            <p>Every effort you make in preaching, attending meetings, strengthening your faith, and worshipping Him is valuable.</p>
+            <p>Keep holding on to your faith. Keep finding joy in serving Jehovah, even on difficult days. Remember that your hard work is never in vain and that Jehovah appreciates your faithful efforts.</p>
+            <p>I hope you continue growing spiritually and never lose the happiness you find in serving Him.</p>
+          </div>
+        </article>
+      </div>
+
+      <p class="blessing reveal">May Jehovah continue to guide you, strengthen your faith, and bless every step you take in serving Him.</p>
+    </section>
+
+
+    <!-- =================================================================
+         7. A QUIET HOPE (closing)
+         ================================================================= -->
+    <section class="section section--hope" id="hope" aria-labelledby="hopeTitle">
+      <div class="section__head reveal">
+        <p class="kicker">The last page</p>
+        <h2 class="section__title" id="hopeTitle">A Quiet Hope</h2>
+      </div>
+
+      <article class="paper paper--closing reveal">
+        <div class="closing__body">
+          <p>Maybe someday, I'll get to see you again, not just in a picture on my screen, but right in front of me.</p>
+          <p>Maybe we'll have more opportunities to talk, laugh, share stories, and create memories that we can look back on someday.</p>
+          <p>Until then, thank you for the conversations, the laughter, the encouragement, and the little moments that became meaningful to me.</p>
+          <p>You might not realize how much those simple interactions have meant, but I genuinely appreciate them.</p>
+          <p>You were someone I noticed for just a moment, but somehow, you've become someone whose presence has remained in my thoughts and memories for years.</p>
+          <p>I don't know what the future holds, but I hope it gives us more opportunities to know each other better.</p>
+          <p>Until then, I'll keep this memory close to my heart.</p>
+        </div>
+
+        <div class="signature">
+          <p class="signature__line">With sincerity,</p>
+          <p class="signature__name">Someone who still remembers that day.</p>
+          <svg class="signature__seal" viewBox="0 0 100 100" aria-hidden="true"><use href="#wax-seal"/></svg>
+        </div>
+      </article>
+
+      <div class="closing__actions reveal">
+        <button type="button" class="btn btn--primary" id="readAgainBtn">
+          <svg class="btn__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          Read again from the beginning
+        </button>
+        <button type="button" class="btn btn--ghost" id="resealBtn">
+          <svg class="btn__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v12H3z"/><path d="M3 7l9 7 9-7"/></svg>
+          Seal the letter again
+        </button>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p>Written with sincerity &middot; kept close to the heart</p>
+    </footer>
+  </main>
+
+
+  <!-- =====================================================================
+       FLOATING UI: chapter dots (wide screens), music, back to top
+       ===================================================================== -->
+  <nav class="dots" id="dots" aria-label="Jump to a chapter">
+    <a href="#top" data-label="Beginning"><span class="visually-hidden">Beginning</span></a>
+    <a href="#letter" data-label="The Letter"><span class="visually-hidden">The Letter</span></a>
+    <a href="#beginning" data-label="The Day It All Began"><span class="visually-hidden">The Day It All Began</span></a>
+    <a href="#moments" data-label="Little Moments"><span class="visually-hidden">Little Moments</span></a>
+    <a href="#dream" data-label="The Girl From My Dreams"><span class="visually-hidden">The Girl From My Dreams</span></a>
+    <a href="#encouragement" data-label="A Little Encouragement"><span class="visually-hidden">A Little Encouragement</span></a>
+    <a href="#hope" data-label="A Quiet Hope"><span class="visually-hidden">A Quiet Hope</span></a>
+  </nav>
+
+  <div class="controls">
+    <button type="button" class="control control--music" id="musicBtn" aria-pressed="false">
+      <svg class="control__icon control__icon--play" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-music"/></svg>
+      <svg class="control__icon control__icon--pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>
+      <span class="control__label" id="musicLabel">Play music</span>
+    </button>
+    <button type="button" class="control control--top" id="backToTopBtn" aria-label="Back to the beginning">
+      <svg class="control__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- Polite status messages for screen readers -->
+  <p class="visually-hidden" id="status" role="status" aria-live="polite"></p>
+
+  <script src="script.js"></script>
+</body>
+</html>
