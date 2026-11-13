@@ -217,19 +217,44 @@
       return;
     }
 
+    /** Reveal an element, plus everything before it on the page, so jumping
+        ahead with a chapter link never leaves blank sections behind. */
+    function reveal(el) {
+      const index = items.indexOf(el);
+      for (let i = 0; i <= index; i++) {
+        if (items[i].classList.contains("is-visible")) continue;
+        items[i].classList.add("is-visible");
+        observer.unobserve(items[i]);
+      }
+    }
+
+    // Start revealing a little BEFORE an element scrolls into view (the
+    // bottom margin extends the trigger zone ~15% below the screen), and
+    // as soon as any part of it is there (threshold 0). The old settings
+    // waited until 12% of an element was visible, which on a phone meant
+    // scrolling ~570px into the tall letter before it appeared.
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
+        // Also catch elements that were skipped past (e.g. a fast fling)
+        const passed = entry.boundingClientRect.top < 0;
+        if (entry.isIntersecting || passed) reveal(entry.target);
       });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+    }, { rootMargin: "0px 0px 15% 0px", threshold: 0 });
 
-    // Stagger siblings slightly (memory cards, dream paragraphs)
-    $$(".memory-grid li.reveal").forEach((el, i) => { el.style.transitionDelay = (i % 3) * 90 + "ms"; });
-    $$(".dream__text .reveal").forEach((el, i) => { el.style.transitionDelay = i * 120 + "ms"; });
+    // A light stagger between neighbours (memory cards, dream paragraphs)
+    $$(".memory-grid li.reveal").forEach((el, i) => { el.style.transitionDelay = (i % 3) * 60 + "ms"; });
+    $$(".dream__text .reveal").forEach((el, i) => { el.style.transitionDelay = i * 70 + "ms"; });
 
     items.forEach((el) => observer.observe(el));
+
+    // Pause the dream section's looping animations while it's off screen
+    const dream = $("#dream");
+    if (dream) {
+      dream.classList.add("is-offscreen");
+      new IntersectionObserver(([entry]) => {
+        dream.classList.toggle("is-offscreen", !entry.isIntersecting);
+      }, { rootMargin: "20% 0px 20% 0px" }).observe(dream);
+    }
   }
 
 
@@ -301,9 +326,19 @@
       img.alt = frame.dataset.alt || "";
       img.decoding = "async";
       // (no loading="lazy" here: a lazy image that isn't in the page yet never loads)
+      // Once downloaded, decode the photo in the background before inserting
+      // it, so it never causes a hitch while scrolling. (If decoding isn't
+      // supported or fails, it's inserted anyway.) A missing file never
+      // fires "load", so the placeholder simply stays.
       img.onload = () => {
-        frame.appendChild(img);
-        frame.classList.add("has-photo");
+        const decoded = img.decode ? img.decode().catch(() => {}) : Promise.resolve();
+        // Background tabs may postpone decoding; never wait more than 300 ms
+        const timeout = new Promise((resolve) => setTimeout(resolve, 300));
+        Promise.race([decoded, timeout]).then(() => {
+          if (frame.classList.contains("has-photo")) return;
+          frame.appendChild(img);
+          frame.classList.add("has-photo");
+        });
       };
       img.src = frame.dataset.photo;
     });
