@@ -444,10 +444,17 @@
       return true;
     }
 
-    function stopSynth() {
+    /** Stop the music box. `immediate` silences it at once (used when the
+        page is hidden, where timers are slowed down and a fade can't finish). */
+    function stopSynth(immediate) {
       if (!ctx) return;
       clearInterval(schedulerId);
       master.gain.cancelScheduledValues(ctx.currentTime);
+      if (immediate) {
+        master.gain.setValueAtTime(0, ctx.currentTime);
+        ctx.suspend().catch(() => {});
+        return;
+      }
       master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
       master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.6);
       setTimeout(() => { if (!playing) ctx.suspend(); }, 700);
@@ -477,10 +484,10 @@
       return playing;
     }
 
-    function pause() {
+    function pause(immediate) {
       playing = false;
       if (audio) audio.pause();
-      if (useSynth) stopSynth();
+      if (useSynth) stopSynth(immediate);
     }
 
     return { play, pause, unlock, isPlaying: () => playing };
@@ -488,8 +495,9 @@
 
   const musicBtn = $("#musicBtn");
   const musicLabel = $("#musicLabel");
-  let pausedByVisitor = false; // once she pauses, never restart on our own
-  let startingMusic = null;    // the play attempt in progress, if any
+  let pausedByVisitor = false;    // once she pauses, never restart on our own
+  let pausedForBackground = false; // paused because she left the page / app
+  let startingMusic = null;       // the play attempt in progress, if any
 
   function setMusicUI(on) {
     musicBtn.setAttribute("aria-pressed", String(on));
@@ -498,6 +506,12 @@
 
   /** Try to start the music (no-op if it's already playing or starting). */
   function startMusic() {
+    if (document.hidden) {
+      pausedForBackground = true;
+      if (Music.isPlaying()) Music.pause(true);
+      setMusicUI(false);
+      return Promise.resolve(false);
+    }
     if (Music.isPlaying()) return Promise.resolve(true);
     if (!startingMusic) {
       Music.unlock();
@@ -505,6 +519,12 @@
         startingMusic = null;
         if (pausedByVisitor) { // she pressed pause while it was starting
           if (ok) Music.pause();
+          return false;
+        }
+        if (ok && document.hidden) { // she left the page while it was starting
+          Music.pause(true);
+          pausedForBackground = true;
+          setMusicUI(false);
           return false;
         }
         setMusicUI(ok);
@@ -522,10 +542,43 @@
     if (musicBtn.contains(event.target)) return; // the music button handles itself
     if (!pausedByVisitor) startMusic();
   }
+  function startListeningForFirstTap() {
+    FIRST_TAP_EVENTS.forEach((type) => document.addEventListener(type, onFirstTap, true));
+  }
   function stopListeningForFirstTap() {
     FIRST_TAP_EVENTS.forEach((type) => document.removeEventListener(type, onFirstTap, true));
   }
-  FIRST_TAP_EVENTS.forEach((type) => document.addEventListener(type, onFirstTap, true));
+  startListeningForFirstTap();
+
+  /* Stop the music when she leaves: switching apps or tabs, locking the
+     phone, or closing the browser. Phones keep web audio playing in the
+     background otherwise. */
+  function pauseForBackground() {
+    pausedForBackground = true;
+    if (Music.isPlaying()) Music.pause(true);
+    setMusicUI(false);
+  }
+
+  /* Never resume automatically when the page becomes active again. The user
+     must intentionally press play after returning. */
+  function resumeFromBackground() {
+    pausedForBackground = true;
+    if (Music.isPlaying()) Music.pause(true);
+    setMusicUI(false);
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pauseForBackground();
+    else resumeFromBackground();
+  });
+  window.addEventListener("blur", () => {
+    pauseForBackground();
+  });
+  window.addEventListener("pagehide", pauseForBackground);    // closing / leaving the page
+  window.addEventListener("beforeunload", pauseForBackground);
+  window.addEventListener("pageshow", () => {                 // coming back via the back button
+    resumeFromBackground();
+  });
 
   musicBtn.addEventListener("click", async () => {
     if (Music.isPlaying()) {
@@ -536,6 +589,7 @@
       announce("Music paused.");
     } else {
       pausedByVisitor = false;
+      pausedForBackground = false;
       const ok = await startMusic();
       announce(ok ? "Music playing." : "Sorry, music isn't available on this device.");
     }
@@ -546,5 +600,12 @@
   createPetals();
   createDreamSky();
   loadPhotos();
-  startMusic(); // try to autoplay right away (works if the browser allows it)
+  // Try to autoplay right away (works if the browser allows it). If the page
+  // was opened in a background tab, wait until she actually looks at it.
+  if (document.hidden) {
+    pausedForBackground = true;
+    setMusicUI(false);
+  } else {
+    startMusic();
+  }
 })();
