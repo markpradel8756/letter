@@ -496,7 +496,8 @@
   const musicBtn = $("#musicBtn");
   const musicLabel = $("#musicLabel");
   let pausedByVisitor = false;    // once she pauses, never restart on our own
-  let pausedForBackground = false; // paused because she left the page / app
+  let pausedForBackground = false; // she left while music had played: play button only
+  let musicHasPlayed = false;      // the music has actually played during this visit
   let startingMusic = null;       // the play attempt in progress, if any
 
   function setMusicUI(on) {
@@ -506,8 +507,7 @@
 
   /** Try to start the music (no-op if it's already playing or starting). */
   function startMusic() {
-    if (document.hidden) {
-      pausedForBackground = true;
+    if (document.hidden) {             // never start while the page isn't on screen
       if (Music.isPlaying()) Music.pause(true);
       setMusicUI(false);
       return Promise.resolve(false);
@@ -521,14 +521,18 @@
           if (ok) Music.pause();
           return false;
         }
-        if (ok && document.hidden) { // she left the page while it was starting
+        if (ok && (document.hidden || pausedForBackground)) {
+          // The page went away before the music became audible: silence it
+          // and leave everything as if it had never started
           Music.pause(true);
-          pausedForBackground = true;
           setMusicUI(false);
           return false;
         }
         setMusicUI(ok);
-        if (ok) stopListeningForFirstTap();
+        if (ok) {
+          musicHasPlayed = true;
+          stopListeningForFirstTap();
+        }
         return ok;
       });
     }
@@ -540,7 +544,8 @@
 
   function onFirstTap(event) {
     if (musicBtn.contains(event.target)) return; // the music button handles itself
-    if (!pausedByVisitor) startMusic();
+    // After she has left once, only the play button may start the music
+    if (!pausedByVisitor && !pausedForBackground) startMusic();
   }
   function startListeningForFirstTap() {
     FIRST_TAP_EVENTS.forEach((type) => document.addEventListener(type, onFirstTap, true));
@@ -548,36 +553,54 @@
   function stopListeningForFirstTap() {
     FIRST_TAP_EVENTS.forEach((type) => document.removeEventListener(type, onFirstTap, true));
   }
-  startListeningForFirstTap();
 
-  /* Stop the music when she leaves: switching apps or tabs, locking the
-     phone, or closing the browser. Phones keep web audio playing in the
-     background otherwise. */
-  function pauseForBackground() {
-    pausedForBackground = true;
-    if (Music.isPlaying()) Music.pause(true);
-    setMusicUI(false);
+  /* Remember (for this browser tab only) that she has left the page, so a
+     reload or coming back with the back button doesn't start the music again. */
+  const LEFT_KEY = "letter-music-stopped-on-leave";
+  function rememberLeft() {
+    try { sessionStorage.setItem(LEFT_KEY, "1"); } catch (e) { /* storage unavailable */ }
+  }
+  function hasLeftBefore() {
+    try { return sessionStorage.getItem(LEFT_KEY) === "1"; } catch (e) { return false; }
   }
 
-  /* Never resume automatically when the page becomes active again. The user
-     must intentionally press play after returning. */
-  function resumeFromBackground() {
-    pausedForBackground = true;
+  /* Stop the music the moment she leaves: switching apps or tabs, locking
+     the phone, closing the browser or navigating away. Phones keep web audio
+     playing in the background otherwise. */
+  function stopForBackground() {
+    if (Music.isPlaying()) Music.pause(true);
+    setMusicUI(false);
+    // If the music had played, it now stays stopped until she presses play:
+    // no tap may restart it, not even after a reload or the back button.
+    // (If it never played, there's nothing to keep stopped.)
+    if (musicHasPlayed) {
+      pausedForBackground = true;
+      stopListeningForFirstTap();
+      rememberLeft();
+    }
+  }
+
+  /* When she comes back, the music stays stopped until she presses play. */
+  function keepStoppedOnReturn() {
+    if (!pausedForBackground) return;
     if (Music.isPlaying()) Music.pause(true);
     setMusicUI(false);
   }
 
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) pauseForBackground();
-    else resumeFromBackground();
+    if (document.hidden) stopForBackground();
+    else keepStoppedOnReturn();
   });
+  // Window loses focus while still visible (e.g. another window on top).
+  // Only counts if music is actually playing: browsers also fire "blur" when
+  // a page simply loads without focus, which isn't leaving.
   window.addEventListener("blur", () => {
-    pauseForBackground();
+    if (Music.isPlaying()) stopForBackground();
   });
-  window.addEventListener("pagehide", pauseForBackground);    // closing / leaving the page
-  window.addEventListener("beforeunload", pauseForBackground);
-  window.addEventListener("pageshow", () => {                 // coming back via the back button
-    resumeFromBackground();
+  window.addEventListener("pagehide", stopForBackground);      // closing / leaving the page
+  document.addEventListener("freeze", stopForBackground);      // Chrome freezing a background tab
+  window.addEventListener("pageshow", (event) => {             // back-button return from memory
+    if (event.persisted) keepStoppedOnReturn();
   });
 
   musicBtn.addEventListener("click", async () => {
@@ -600,12 +623,14 @@
   createPetals();
   createDreamSky();
   loadPhotos();
-  // Try to autoplay right away (works if the browser allows it). If the page
-  // was opened in a background tab, wait until she actually looks at it.
-  if (document.hidden) {
+  // If she already left this page while music was playing (reload / back
+  // button in the same tab), the music waits for the play button.
+  // Otherwise try to autoplay now (if on screen), or start on her first tap.
+  if (hasLeftBefore()) {
     pausedForBackground = true;
     setMusicUI(false);
   } else {
-    startMusic();
+    startListeningForFirstTap();
+    if (!document.hidden) startMusic();
   }
 })();
