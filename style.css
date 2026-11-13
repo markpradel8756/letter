@@ -186,7 +186,9 @@ body.is-sealed .skip-link { display: none; }
   border-radius: 3px;
   box-shadow: var(--shadow-lift), inset 0 0 60px rgba(118, 91, 73, .12);
 }
-/* A second sheet peeking out behind, slightly turned */
+/* A second sheet peeking out behind.
+   No rotation here: on the very tall letter even a tiny tilt swings the
+   corners far past the screen edge on phones, which shifts the whole page. */
 .paper::before {
   content: "";
   position: absolute;
@@ -194,7 +196,7 @@ body.is-sealed .skip-link { display: none; }
   z-index: -1;
   background: #ead8b8;
   border-radius: 3px;
-  transform: rotate(-1.6deg) translate(-6px, 8px);
+  transform: translate(-6px, 9px);
   box-shadow: var(--shadow-soft);
 }
 
@@ -618,6 +620,7 @@ body.is-sealed .progress { opacity: 0; }
 .story {
   position: relative;
   z-index: 2;
+  overflow-x: clip;     /* safety net: nothing may widen the page sideways */
   opacity: 0;
   transition: opacity 1.2s ease;
 }
@@ -1231,6 +1234,8 @@ body.is-sealed .progress { opacity: 0; }
     radial-gradient(ellipse at 50% 30%, rgba(232, 183, 183, .35), transparent 65%);
 }
 .paper--closing { max-width: 720px; }
+/* The short closing page can keep a gentle tilt on its back sheet */
+.paper--closing::before { transform: rotate(-1.2deg) translate(-4px, 8px); }
 .closing__body p {
   font-family: var(--font-hand);
   font-size: clamp(1.45rem, 2.7vw, 1.65rem);
@@ -1413,8 +1418,49 @@ body.is-sealed .control--top { display: none; }
   .dots { display: flex; }
 }
 
+/* Phones and small tablets: centre everything in one neat column */
+@media (max-width: 819px) {
+  /* Timeline: the thread runs down the middle, a heart sits above each note */
+  .timeline::before { left: 50%; transform: translateX(-1px); }
+  .timeline__item {
+    padding-left: 0;
+    padding-top: 1.9rem;
+    margin-bottom: 1.5rem;
+  }
+  .timeline__item::before { top: 0; left: 50%; margin-left: -8px; }
+  .note { text-align: center; }
+}
+
+@media (max-width: 899px) {
+  /* Dream section: text centred under the photo */
+  .dream__text { text-align: center; }
+}
+
+@media (max-width: 600px) {
+  /* Closing signature and seal centred */
+  .signature { text-align: center; }
+  .signature__seal { margin: 1.25rem auto 0; }
+}
+
 /* Small phones */
 @media (max-width: 480px) {
+  /* Chapter links as an even two-column grid instead of ragged rows */
+  .chapters__list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .55rem;
+  }
+  .chapters__list a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 44px;
+    padding: .4rem .6rem;
+    font-size: .98rem;
+    line-height: 1.25;
+    text-align: center;
+  }
   body { font-size: 1.12rem; }
   .letter { --lh: 2.1rem; }
   .memory-card { height: 11.5rem; }
