@@ -747,6 +747,10 @@ body.is-sealed .progress { opacity: 0; }
 }
 .letter__body p { margin-bottom: var(--lh); }
 .letter__body p:last-child { margin-bottom: 0; }
+.letter__confess {
+  font-weight: 600;
+  color: var(--burgundy);
+}
 
 .letter__greeting {
   margin-bottom: var(--lh);
