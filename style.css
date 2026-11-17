@@ -1366,6 +1366,9 @@ body.is-sealed .control--top { display: none; }
   gap: .9rem;
   transform: translateY(-50%);
 }
+/* Never shown on the envelope screen, only once the letter is open */
+.dots[hidden],
+body.is-sealed .dots { display: none !important; }
 .dots a {
   position: relative;
   display: block;

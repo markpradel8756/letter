@@ -26,6 +26,7 @@
   const openBtn = $("#openLetterBtn");
   const story = $("#story");
   const storyTitle = $("#storyTitle");
+  const dots = $("#dots");
   const statusEl = $("#status");
 
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -106,6 +107,7 @@
     opening.hidden = true;
     story.hidden = false;
     body.classList.remove("is-sealed");
+    dots.hidden = false;
     window.scrollTo(0, 0);
 
     // Let the browser paint the hidden->visible change before fading in
@@ -132,6 +134,7 @@
     story.classList.remove("is-visible");
     story.hidden = true;
     body.classList.add("is-sealed");
+    dots.hidden = true;
     window.scrollTo(0, 0);
 
     // Reset the envelope while it's still hidden, so it reappears sealed
