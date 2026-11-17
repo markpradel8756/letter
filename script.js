@@ -1,22 +1,9 @@
-/* =========================================================================
-   A Letter From My Heart: interactions (vanilla JavaScript)
-   -------------------------------------------------------------------------
-    1. Setup & helpers
-    2. Envelope opening & re-sealing
-    3. Floating petals and hearts
-    4. Dream sky (stars + glowing motes)
-    5. Reveal-on-scroll
-    6. Reading progress, back-to-top, chapter dots
-    7. Memory cards (flip)
-    8. Photo placeholders (auto-load real photos if present)
-    9. Background music (opt-in only)
-   10. Start
-   ========================================================================= */
+/* Letter interactions */
 
 (function () {
   "use strict";
 
-  /* ---------- 1. Setup & helpers ---------- */
+  /* Setup */
   const $ = (selector, scope = document) => scope.querySelector(selector);
   const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
 
@@ -31,35 +18,27 @@
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const reduceMotion = () => reducedMotionQuery.matches;
 
-  /** Announce a short message to screen readers. */
+  /** Announce a short message. */
   function announce(message) {
     statusEl.textContent = "";
-    // A tiny delay makes repeated messages announce reliably
     setTimeout(() => { statusEl.textContent = message; }, 50);
   }
 
-  /** Random number between min and max. */
+  /** Random number. */
   const rand = (min, max) => Math.random() * (max - min) + min;
 
-
-  /* ---------- 2. Envelope opening & re-sealing ---------- */
+  /* Open the letter */
   let isOpen = false;
   let storyInitialised = false;
 
-  /* The opening plays as a sequence of stages. Each stage adds a class to the
-     envelope, and style.css animates it (times in milliseconds):
-       is-cracking  → the seal wobbles, cracks in two and falls away
-       is-flap-open → the flap swings open and warm light spills out
-       is-rising    → the letter rises out of the envelope
-       is-unfolding → the envelope slips away; the letter comes forward  */
   const STAGES = [
     { at: 0,    cls: "is-cracking" },
     { at: 650,  cls: "is-flap-open" },
     { at: 1400, cls: "is-rising" },
     { at: 2550, cls: "is-unfolding" }
   ];
-  const BURST_AT = 330;   // hearts burst out as the seal splits
-  const LEAVE_AT = 3350;  // the whole screen fades into the story
+  const BURST_AT = 330;
+  const LEAVE_AT = 3350;
   const SHOW_AT = 4100;
   const STAGE_CLASSES = STAGES.map((s) => s.cls);
   let stageTimers = [];
@@ -82,7 +61,7 @@
     later(showStory, SHOW_AT);
   }
 
-  /** Little hearts, petals and gold flecks bursting out of the broken seal. */
+  /** Burst hearts and petals. */
   function burstFromSeal() {
     const count = 16;
     for (let i = 0; i < count; i++) {
@@ -93,7 +72,7 @@
       const angle = (i / count) * Math.PI * 2 + rand(-0.25, 0.25);
       const distance = rand(70, 150);
       bit.style.setProperty("--dx", (Math.cos(angle) * distance).toFixed(0) + "px");
-      bit.style.setProperty("--dy", (Math.sin(angle) * distance - 40).toFixed(0) + "px"); // drift upward
+      bit.style.setProperty("--dy", (Math.sin(angle) * distance - 40).toFixed(0) + "px");
       bit.style.setProperty("--scale", rand(0.6, 1.25).toFixed(2));
       bit.style.setProperty("--rot", rand(-200, 200).toFixed(0) + "deg");
 
@@ -108,7 +87,6 @@
     body.classList.remove("is-sealed");
     window.scrollTo(0, 0);
 
-    // Let the browser paint the hidden->visible change before fading in
     requestAnimationFrame(() => {
       requestAnimationFrame(() => story.classList.add("is-visible"));
     });
@@ -124,7 +102,7 @@
     updateProgress();
   }
 
-  /** Put the letter back in its envelope and show the opening screen again. */
+  /** Seal the letter again. */
   function resealLetter() {
     stageTimers.forEach(clearTimeout);
     stageTimers = [];
@@ -134,8 +112,6 @@
     body.classList.add("is-sealed");
     window.scrollTo(0, 0);
 
-    // Reset the envelope while it's still hidden, so it reappears sealed
-    // instantly instead of animating backwards
     opening.classList.remove("is-leaving", "is-opening");
     envelope.classList.remove(...STAGE_CLASSES);
     $$(".burst", envelope).forEach((bit) => bit.remove());
@@ -151,8 +127,7 @@
   envelope.addEventListener("click", openLetter);
   $("#resealBtn").addEventListener("click", resealLetter);
 
-
-  /* ---------- 3. Floating petals and hearts ---------- */
+  /* Floating shapes */
   function createPetals() {
     const layer = $("#petals");
     if (!layer || reduceMotion()) return;
@@ -162,7 +137,7 @@
 
     for (let i = 0; i < count; i++) {
       const petal = document.createElement("span");
-      const isHeart = i % 5 === 0; // every fifth one is a tiny heart
+      const isHeart = i % 5 === 0;
       petal.className = isHeart ? "petal petal--heart" : "petal";
       petal.style.setProperty("--x", rand(0, 96) + "vw");
       petal.style.setProperty("--size", rand(10, 18).toFixed(1) + "px");
@@ -174,8 +149,7 @@
     layer.appendChild(fragment);
   }
 
-
-  /* ---------- 4. Dream sky (stars + glowing motes) ---------- */
+  /* Dream sky */
   function createDreamSky() {
     const sky = $("#dreamSky");
     if (!sky || reduceMotion()) return;
@@ -207,8 +181,7 @@
     sky.appendChild(fragment);
   }
 
-
-  /* ---------- 5. Reveal-on-scroll ---------- */
+  /* Scroll reveal */
   function initReveal() {
     const items = $$(".reveal");
 
@@ -217,8 +190,6 @@
       return;
     }
 
-    /** Reveal an element, plus everything before it on the page, so jumping
-        ahead with a chapter link never leaves blank sections behind. */
     function reveal(el) {
       const index = items.indexOf(el);
       for (let i = 0; i <= index; i++) {
@@ -228,26 +199,18 @@
       }
     }
 
-    // Start revealing a little BEFORE an element scrolls into view (the
-    // bottom margin extends the trigger zone ~15% below the screen), and
-    // as soon as any part of it is there (threshold 0). The old settings
-    // waited until 12% of an element was visible, which on a phone meant
-    // scrolling ~570px into the tall letter before it appeared.
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        // Also catch elements that were skipped past (e.g. a fast fling)
         const passed = entry.boundingClientRect.top < 0;
         if (entry.isIntersecting || passed) reveal(entry.target);
       });
     }, { rootMargin: "0px 0px 15% 0px", threshold: 0 });
 
-    // A light stagger between neighbours (memory cards, dream paragraphs)
     $$(".memory-grid li.reveal").forEach((el, i) => { el.style.transitionDelay = (i % 3) * 60 + "ms"; });
     $$(".dream__text .reveal").forEach((el, i) => { el.style.transitionDelay = i * 70 + "ms"; });
 
     items.forEach((el) => observer.observe(el));
 
-    // Pause the dream section's looping animations while it's off screen
     const dream = $("#dream");
     if (dream) {
       dream.classList.add("is-offscreen");
@@ -257,8 +220,7 @@
     }
   }
 
-
-  /* ---------- 6. Reading progress, back-to-top, chapter dots ---------- */
+  /* Progress */
   const progressBar = $("#progressBar");
   const backToTopBtn = $("#backToTopBtn");
   let ticking = false;
@@ -286,7 +248,7 @@
   backToTopBtn.addEventListener("click", scrollToBeginning);
   $("#readAgainBtn").addEventListener("click", scrollToBeginning);
 
-  /** Highlight the chapter dot for the section currently in view. */
+  /** Update chapter dots. */
   function initDots() {
     if (!("IntersectionObserver" in window)) return;
     const links = $$("#dots a");
@@ -307,8 +269,7 @@
     });
   }
 
-
-  /* ---------- 7. Memory cards (flip) ---------- */
+  /* Memory cards */
   $$(".memory-card").forEach((card) => {
     card.addEventListener("click", () => {
       const flipped = card.classList.toggle("is-flipped");
@@ -316,23 +277,14 @@
     });
   });
 
-
-  /* ---------- 8. Photo placeholders ----------
-     Each .photo has a data-photo path (e.g. images/group-photo.jpg).
-     If that file exists, it's shown; otherwise the placeholder stays. */
+  /* Photos */
   function loadPhotos() {
     $$(".photo[data-photo]").forEach((frame) => {
       const img = new Image();
       img.alt = frame.dataset.alt || "";
       img.decoding = "async";
-      // (no loading="lazy" here: a lazy image that isn't in the page yet never loads)
-      // Once downloaded, decode the photo in the background before inserting
-      // it, so it never causes a hitch while scrolling. (If decoding isn't
-      // supported or fails, it's inserted anyway.) A missing file never
-      // fires "load", so the placeholder simply stays.
       img.onload = () => {
         const decoded = img.decode ? img.decode().catch(() => {}) : Promise.resolve();
-        // Background tabs may postpone decoding; never wait more than 300 ms
         const timeout = new Promise((resolve) => setTimeout(resolve, 300));
         Promise.race([decoded, timeout]).then(() => {
           if (frame.classList.contains("has-photo")) return;
@@ -344,30 +296,20 @@
     });
   }
 
-
-  /* ---------- 9. Background music (plays automatically, can be paused) ----------
-     The page tries to start the music as soon as it loads. Browsers usually
-     block sound until the visitor has tapped or clicked once, so if that
-     happens the music starts on her first tap (normally opening the letter).
-     The music button pauses / resumes it at any time, and once she pauses,
-     it never restarts by itself.
-     If "assets/music.mp3" exists it is used; otherwise a soft music-box
-     melody is generated with the Web Audio API. */
+  /* Music */
   const Music = (function () {
     const FILE = "assets/music.mp3";
     let audio = null;
     let useSynth = false;
     let playing = false;
 
-    // --- Web Audio music box ---
     let ctx = null;
     let master = null;
     let schedulerId = null;
     let nextNoteTime = 0;
     let step = 0;
 
-    const NOTE_LENGTH = 0.42; // seconds per note (gentle tempo)
-    // Four arpeggiated chords (F, Dm, Bb, C) as MIDI note numbers
+    const NOTE_LENGTH = 0.42;
     const BARS = [
       [65, 72, 77, 81, 84, 81, 77, 72],
       [62, 69, 74, 77, 81, 77, 74, 69],
@@ -384,7 +326,6 @@
       master = ctx.createGain();
       master.gain.value = 0;
 
-      // Warm the sound and add a soft echo
       const tone = ctx.createBiquadFilter();
       tone.type = "lowpass";
       tone.frequency.value = 2600;
@@ -438,20 +379,17 @@
       while (nextNoteTime < ctx.currentTime + 0.3) {
         const bar = BARS[Math.floor(step / 8) % BARS.length];
         const index = step % 8;
-        const volume = index === 0 ? 0.16 : 0.09; // a slightly stronger first beat
+        const volume = index === 0 ? 0.16 : 0.09;
         playNote(bar[index], nextNoteTime, volume);
         nextNoteTime += NOTE_LENGTH;
         step++;
       }
     }
 
-    /** True once the browser has seen a tap/click/key press on this page. */
     function hasUserGesture() {
       return !(navigator.userActivation && !navigator.userActivation.hasBeenActive);
     }
 
-    /** Create and wake the audio engine. Call this directly inside a tap
-        handler: some browsers (Safari) only allow it there. */
     function unlock() {
       if (!hasUserGesture()) return;
       if (!ctx && !setupSynth()) return;
@@ -460,11 +398,10 @@
 
     async function startSynth() {
       if (!ctx) {
-        if (!hasUserGesture()) return false; // not allowed yet: wait for a tap
+        if (!hasUserGesture()) return false;
         if (!setupSynth()) return false;
       }
       if (ctx.state !== "running") {
-        // resume() can hang while sound is blocked, so don't wait forever
         await Promise.race([ctx.resume().catch(() => {}), new Promise((r) => setTimeout(r, 500))]);
       }
       if (ctx.state !== "running") return false;
@@ -479,8 +416,6 @@
       return true;
     }
 
-    /** Stop the music box. `immediate` silences it at once (used when the
-        page is hidden, where timers are slowed down and a fade can't finish). */
     function stopSynth(immediate) {
       if (!ctx) return;
       clearInterval(schedulerId);
@@ -495,8 +430,6 @@
       setTimeout(() => { if (!playing) ctx.suspend(); }, 700);
     }
 
-    /** Start the music. Resolves true if it is now playing, false if the
-        browser is still blocking sound (try again after a tap). */
     async function play() {
       if (!useSynth) {
         try {
@@ -509,8 +442,7 @@
           playing = true;
           return true;
         } catch (err) {
-          if (err && err.name === "NotAllowedError") return false; // blocked until a tap
-          // No music file (or it can't be played): use the music box instead
+          if (err && err.name === "NotAllowedError") return false;
           useSynth = true;
           audio = null;
         }
@@ -530,18 +462,17 @@
 
   const musicBtn = $("#musicBtn");
   const musicLabel = $("#musicLabel");
-  let pausedByVisitor = false; // she pressed pause herself: never restart on our own
-  let resumeOnReturn = false;  // music was playing when she left: play again when she's back
-  let startingMusic = null;    // the play attempt in progress, if any
+  let pausedByVisitor = false;
+  let resumeOnReturn = false;
+  let startingMusic = null;
 
   function setMusicUI(on) {
     musicBtn.setAttribute("aria-pressed", String(on));
     musicLabel.textContent = on ? "Pause music" : "Play music";
   }
 
-  /** Try to start the music (no-op if it's already playing or starting). */
   function startMusic() {
-    if (document.hidden) {             // never start while the page isn't on screen
+    if (document.hidden) {
       if (Music.isPlaying()) Music.pause(true);
       setMusicUI(false);
       return Promise.resolve(false);
@@ -551,12 +482,11 @@
       Music.unlock();
       startingMusic = Music.play().then((ok) => {
         startingMusic = null;
-        if (pausedByVisitor) { // she pressed pause while it was starting
+        if (pausedByVisitor) {
           if (ok) Music.pause();
           return false;
         }
         if (ok && document.hidden) {
-          // She left while it was starting: silence it, play when she's back
           Music.pause(true);
           resumeOnReturn = true;
           setMusicUI(false);
@@ -570,11 +500,10 @@
     return startingMusic;
   }
 
-  // Autoplay fallback: start on the first tap, click or key press anywhere
   const FIRST_TAP_EVENTS = ["click", "keydown", "touchend"];
 
   function onFirstTap(event) {
-    if (musicBtn.contains(event.target)) return; // the music button handles itself
+    if (musicBtn.contains(event.target)) return;
     if (!pausedByVisitor) startMusic();
   }
   function startListeningForFirstTap() {
@@ -584,9 +513,6 @@
     FIRST_TAP_EVENTS.forEach((type) => document.removeEventListener(type, onFirstTap, true));
   }
 
-  /* Stop the music the moment she leaves: switching apps or tabs, locking
-     the phone, closing the browser or navigating away. Phones keep web audio
-     playing in the background otherwise. */
   function stopForBackground() {
     if (!Music.isPlaying()) return;
     Music.pause(true);
@@ -594,14 +520,10 @@
     setMusicUI(false);
   }
 
-  /* When she comes back, the music plays again automatically, but only if
-     it was playing when she left (if she had paused it, it stays paused). */
   async function resumeOnComeBack() {
     if (!resumeOnReturn || document.hidden || pausedByVisitor) return;
     resumeOnReturn = false;
     const ok = await startMusic();
-    // Some phones (iPhone) need a fresh tap before sound may play again:
-    // in that case the next tap anywhere on the page resumes it
     if (!ok && !pausedByVisitor) startListeningForFirstTap();
   }
 
@@ -609,11 +531,11 @@
     if (document.hidden) stopForBackground();
     else resumeOnComeBack();
   });
-  window.addEventListener("blur", stopForBackground);       // window loses focus
-  window.addEventListener("focus", resumeOnComeBack);       // ...and gets it back
-  window.addEventListener("pagehide", stopForBackground);   // closing / leaving the page
-  document.addEventListener("freeze", stopForBackground);   // Chrome freezing a background tab
-  window.addEventListener("pageshow", (event) => {          // back-button return from memory
+  window.addEventListener("blur", stopForBackground);
+  window.addEventListener("focus", resumeOnComeBack);
+  window.addEventListener("pagehide", stopForBackground);
+  document.addEventListener("freeze", stopForBackground);
+  window.addEventListener("pageshow", (event) => {
     if (event.persisted) resumeOnComeBack();
   });
 
@@ -632,14 +554,10 @@
     }
   });
 
-
-  /* ---------- 10. Start ---------- */
+  /* Start */
   createPetals();
   createDreamSky();
   loadPhotos();
-  // Try to autoplay right away (works if the browser allows it); otherwise
-  // the music starts on her first tap. If the page was opened in a
-  // background tab, it starts as soon as she actually looks at it.
   startListeningForFirstTap();
   if (document.hidden) resumeOnReturn = true;
   else startMusic();

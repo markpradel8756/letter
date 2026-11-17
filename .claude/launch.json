@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "letter", "runtimeExecutable": "node", "runtimeArgs": ["C:/Users/User/AppData/Local/Temp/claude/c20fde73cf87ab5b/03ee416e-122d-46dc-997f-679e1ee81b92/scratchpad/serve.js", "D:/VS Sandbox/idk", "5517"], "port": 5517 }
+  ]
+}
